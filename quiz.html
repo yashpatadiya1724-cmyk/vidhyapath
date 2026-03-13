@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz – VidhyaPath</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/accessibility.css">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .subject-picker {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+    .subject-card {
+      background: var(--bg-card);
+      border: 3px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .subject-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+    .subject-card.selected {
+      border-color: var(--primary);
+      background: rgba(108,99,255,0.08);
+      box-shadow: var(--shadow-md);
+    }
+    .subject-icon { font-size: 52px; margin-bottom: 12px; display: block; }
+    .diff-picker {
+      display: flex;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-xl);
+    }
+    .diff-btn {
+      flex: 1;
+      min-width: 100px;
+      padding: var(--space-md) var(--space-lg);
+      border-radius: var(--radius-lg);
+      border: 3px solid var(--border);
+      font-family: var(--font-main);
+      font-size: var(--font-size-base);
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--bg-sidebar);
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+    .diff-btn.easy.selected   { border-color: #6BCB77; background: rgba(107,203,119,0.1); color: #4a9955; }
+    .diff-btn.medium.selected { border-color: #FFB347; background: rgba(255,179,71,0.1); color: #cc8000; }
+    .diff-btn.hard.selected   { border-color: #FF6B6B; background: rgba(255,107,107,0.1); color: #cc3333; }
+    .diff-btn:hover { transform: scale(1.03); }
+
+    #quiz-setup { display: block; }
+    #quiz-running { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="logo-icon">📚</div>
+      <h1>Vidhya<span>Path</span></h1>
+    </div>
+    <ul class="navbar-nav">
+      <li><a href="index.html" class="nav-link">🏠 Home</a></li>
+      <li><a href="lesson.html" class="nav-link">📖 Lessons</a></li>
+      <li><a href="quiz.html" class="nav-link active">📝 Quiz</a></li>
+      <li><a href="dashboard.html" class="nav-link">📊 Dashboard</a></li>
+    </ul>
+    <div class="navbar-tools" style="display:flex;gap:12px;align-items:center">
+      <span style="font-size:13px;font-weight:700;color:var(--text-secondary)">
+        ⭐ <span class="student-points">0 pts</span>
+      </span>
+      <button class="btn-icon" id="tts-btn"><span id="tts-label">🔊</span></button>
+    </div>
+  </nav>
+
+  <!-- PAGE WRAPPER -->
+  <div class="page-wrapper">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h4>Quiz Menu</h4>
+        <a href="quiz.html" class="sidebar-item active">
+          <span class="icon">📝</span><span class="label">Take Quiz</span>
+        </a>
+        <a href="lesson.html" class="sidebar-item">
+          <span class="icon">📖</span><span class="label">Study First</span>
+        </a>
+        <a href="dashboard.html" class="sidebar-item">
+          <span class="icon">📊</span><span class="label">My Scores</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <h4>Your Stats</h4>
+        <div class="stat-card" style="padding:16px;text-align:left">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:4px">Total Quizzes</div>
+          <div style="font-size:24px;font-weight:800;color:var(--primary)" id="side-quizzes">0</div>
+        </div>
+        <div class="stat-card" style="padding:16px;text-align:left;margin-top:8px">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:4px">Best Score</div>
+          <div style="font-size:24px;font-weight:800;color:var(--success)" id="side-best">0%</div>
+        </div>
+        <div class="stat-card" style="padding:16px;text-align:left;margin-top:8px">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:4px">Current Mode</div>
+          <div style="font-size:16px;font-weight:800;color:var(--warning)" id="side-mode">Performing</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h4>Accessibility</h4>
+        <button class="sidebar-item" id="btn-dyslexia">
+          <span class="icon">Aa</span><span class="label">Dyslexia Font</span>
+        </button>
+        <button class="sidebar-item" id="btn-contrast">
+          <span class="icon">◑</span><span class="label">High Contrast</span>
+        </button>
+        <button class="sidebar-item" id="btn-simple">
+          <span class="icon">🧘</span><span class="label">Simple Mode</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+      <!-- QUIZ SETUP -->
+      <div id="quiz-setup">
+        <div style="margin-bottom:var(--space-xl)">
+          <h2>📝 Start a Quiz</h2>
+          <p style="color:var(--text-secondary)">
+            Choose a subject and difficulty. Your UI adapts based on your performance!
+          </p>
+        </div>
+
+        <!-- Adaptive Recommendation -->
+        <div class="highlight-box" style="margin-bottom:var(--space-xl)" id="adaptive-rec">
+          <strong>🤖 Adaptive Recommendation:</strong>
+          Based on your learning history, we suggest
+          <strong id="rec-subject">Mathematics</strong> at
+          <strong id="rec-difficulty">Medium</strong> difficulty.
+        </div>
+
+        <!-- SUBJECT PICKER -->
+        <h3 style="margin-bottom:var(--space-md)">1️⃣ Choose Subject</h3>
+        <div class="subject-picker">
+          <div class="subject-card selected" onclick="selectSubject('math', this)" id="card-math">
+            <span class="subject-icon">🔢</span>
+            <h4>Mathematics</h4>
+            <p style="font-size:13px;color:var(--text-secondary);margin:0">Numbers, geometry, algebra</p>
+          </div>
+          <div class="subject-card" onclick="selectSubject('science', this)" id="card-science">
+            <span class="subject-icon">🔬</span>
+            <h4>Science</h4>
+            <p style="font-size:13px;color:var(--text-secondary);margin:0">Plants, space, forces</p>
+          </div>
+          <div class="subject-card" onclick="selectSubject('skills', this)" id="card-skills">
+            <span class="subject-icon">💡</span>
+            <h4>Skill India</h4>
+            <p style="font-size:13px;color:var(--text-secondary);margin:0">Digital, coding, NEP 2020</p>
+          </div>
+        </div>
+
+        <!-- DIFFICULTY PICKER -->
+        <h3 style="margin-bottom:var(--space-md)">2️⃣ Choose Difficulty</h3>
+        <div class="diff-picker">
+          <button class="diff-btn easy" onclick="selectDiff('easy', this)">
+            🌱 Easy<br><span style="font-size:13px;opacity:0.7">Beginner friendly</span>
+          </button>
+          <button class="diff-btn medium selected" onclick="selectDiff('medium', this)">
+            🌿 Medium<br><span style="font-size:13px;opacity:0.7">Recommended</span>
+          </button>
+          <button class="diff-btn hard" onclick="selectDiff('hard', this)">
+            🔥 Hard<br><span style="font-size:13px;opacity:0.7">Challenge yourself</span>
+          </button>
+        </div>
+
+        <!-- QUIZ OPTIONS -->
+        <div class="card" style="margin-bottom:var(--space-xl)">
+          <h4 style="margin-bottom:var(--space-md)">⚙️ Quiz Settings</h4>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--space-md)">
+            <div>
+              <div style="font-weight:600;font-size:13px;margin-bottom:8px">Questions</div>
+              <div style="font-size:20px;font-weight:800;color:var(--primary)">5</div>
+              <div style="font-size:12px;color:var(--text-muted)">questions per quiz</div>
+            </div>
+            <div>
+              <div style="font-weight:600;font-size:13px;margin-bottom:8px">Time Limit</div>
+              <div style="font-size:20px;font-weight:800;color:var(--warning)">30s</div>
+              <div style="font-size:12px;color:var(--text-muted)" id="timer-note">per question (adaptive)</div>
+            </div>
+            <div>
+              <div style="font-weight:600;font-size:13px;margin-bottom:8px">Hints</div>
+              <div style="font-size:20px;font-weight:800;color:var(--success)" id="hints-status">Available</div>
+              <div style="font-size:12px;color:var(--text-muted)">based on your mode</div>
+            </div>
+            <div>
+              <div style="font-weight:600;font-size:13px;margin-bottom:8px">Current Mode</div>
+              <div style="font-size:20px;font-weight:800;color:var(--primary)" id="current-mode-display">–</div>
+              <div style="font-size:12px;color:var(--text-muted)">adaptive UI mode</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- START BUTTON -->
+        <div style="text-align:center">
+          <button class="btn btn-primary btn-lg" onclick="launchQuiz()">
+            🚀 Start Quiz!
+          </button>
+          <p style="font-size:13px;color:var(--text-muted);margin-top:12px">
+            Your UI will automatically adapt based on your performance
+          </p>
+        </div>
+      </div>
+
+      <!-- QUIZ RUNNING -->
+      <div id="quiz-running">
+        <div id="quiz-area">
+          <!-- Rendered by QuizEngine -->
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- A11Y TOOLBAR -->
+  <div class="a11y-toolbar">
+    <button class="a11y-btn" id="btn-focus"><span>🎯</span><span class="tooltip">Focus Mode</span></button>
+    <button class="a11y-btn" id="btn-dark"><span>🌙</span><span class="tooltip">Dark Mode</span></button>
+    <button class="a11y-btn" id="btn-font-up"><span>A+</span><span class="tooltip">Larger Font</span></button>
+    <button class="a11y-btn" id="btn-font-down"><span>A-</span><span class="tooltip">Smaller Font</span></button>
+  </div>
+
+  <!-- ADAPTIVE INDICATOR -->
+  <div class="adaptive-indicator" id="adaptive-indicator">
+    <div class="adaptive-dot"></div>
+    <span class="adaptive-text" id="adaptive-text">🌿 Ready for Quiz</span>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="js/app.js"></script>
+  <script src="js/adaptiveUI.js"></script>
+  <script src="js/quizEngine.js"></script>
+  <script src="js/progressTracker.js"></script>
+  <script>
+    let selectedSubject = 'math';
+    let selectedDifficulty = 'medium';
+
+    function selectSubject(subject, el) {
+      document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedSubject = subject;
+    }
+
+    function selectDiff(diff, el) {
+      document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedDifficulty = diff;
+    }
+
+    function launchQuiz() {
+      document.getElementById('quiz-setup').style.display = 'none';
+      document.getElementById('quiz-running').style.display = 'block';
+
+      QuizEngine.setDifficulty(selectedDifficulty);
+      QuizEngine.startQuiz(selectedSubject, selectedDifficulty);
+
+      App.showToast('🎯 Quiz Started!', `${selectedSubject} · ${selectedDifficulty} · 5 questions`, 'info');
+      window.scrollTo(0, 0);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const profile = App.getProfile();
+      const mode = AdaptiveUI.getCurrentMode();
+      const modeConfig = AdaptiveUI.UI_MODES[mode];
+
+      // Stats
+      document.getElementById('side-quizzes').textContent = profile.progress.quizzesCompleted || 0;
+      const bestScore = profile.adaptive.accuracyHistory?.length > 0
+        ? Math.max(...profile.adaptive.accuracyHistory) + '%'
+        : '0%';
+      document.getElementById('side-best').textContent = bestScore;
+      document.getElementById('side-mode').textContent = modeConfig.emoji + ' ' + modeConfig.name;
+      document.getElementById('current-mode-display').textContent = modeConfig.emoji + ' ' + modeConfig.name;
+
+      // Adaptive recommendation
+      const recDiff = AdaptiveUI.getDifficultyFromMode(mode);
+      document.getElementById('rec-subject').textContent = selectedSubject.charAt(0).toUpperCase() + selectedSubject.slice(1);
+      document.getElementById('rec-difficulty').textContent = recDiff.charAt(0).toUpperCase() + recDiff.slice(1);
+
+      // Auto-select recommended difficulty
+      selectDiff(recDiff, document.querySelector('.diff-btn.' + recDiff));
+
+      // Hints status
+      document.getElementById('hints-status').textContent =
+        (mode === 'struggling' || mode === 'progressing') ? '✓ ON' : 'OFF';
+
+      // URL params
+      const params = new URLSearchParams(window.location.search);
+      const subj = params.get('subject');
+      const diff = params.get('difficulty');
+      if (subj && document.getElementById('card-' + subj)) {
+        document.querySelectorAll('.subject-card').forEach(c => c.classList.remove('selected'));
+        document.getElementById('card-' + subj).classList.add('selected');
+        selectedSubject = subj;
+      }
+      if (diff) {
+        selectDiff(diff, document.querySelector('.diff-btn.' + diff) || document.querySelector('.diff-btn.medium'));
+        selectedDifficulty = diff;
+      }
+    });
+  </script>
+</body>
+</html>

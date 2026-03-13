@@ -1,0 +1,16 @@
+{
+  "name": "vidhyapath-adaptive-learning",
+  "version": "1.0.0",
+  "description": "Adaptive E-Learning Platform for Vikshit Bharat 2047 – NEP 2020 & Skill India",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js"
+  },
+  "keywords": ["adaptive-learning", "NEP2020", "SkillIndia", "accessibility", "neurodivergent", "education"],
+  "author": "VidhyaPath Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

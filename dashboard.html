@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard – VidhyaPath</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/accessibility.css">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <style>
+    .adaptive-status-card {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white; border: none;
+    }
+    .adaptive-status-card h3, .adaptive-status-card p { color: white; }
+    .achievement-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px; border-radius: var(--radius-md);
+      background: var(--bg-sidebar); margin-bottom: 8px;
+    }
+    .timeline-item {
+      display: flex; gap: 16px; padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .timeline-dot {
+      width: 12px; height: 12px; min-width: 12px;
+      border-radius: 50%; background: var(--primary);
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="logo-icon">📚</div>
+      <h1>Vidhya<span>Path</span></h1>
+    </div>
+    <ul class="navbar-nav">
+      <li><a href="index.html" class="nav-link">🏠 Home</a></li>
+      <li><a href="lesson.html" class="nav-link">📖 Lessons</a></li>
+      <li><a href="quiz.html" class="nav-link">📝 Quiz</a></li>
+      <li><a href="dashboard.html" class="nav-link active">📊 Dashboard</a></li>
+    </ul>
+    <div class="navbar-tools" style="display:flex;align-items:center;gap:12px">
+      <div style="font-size:13px;font-weight:700;color:var(--text-secondary)">
+        ⭐ <span class="student-points">0 pts</span>
+      </div>
+      <button class="btn-icon" id="tts-btn"><span id="tts-label">🔊</span></button>
+    </div>
+  </nav>
+
+  <!-- PAGE WRAPPER -->
+  <div class="page-wrapper">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <!-- Profile Card -->
+        <div style="text-align:center;padding:var(--space-md) 0;margin-bottom:var(--space-lg)">
+          <div class="profile-avatar" style="margin:0 auto" id="profile-avatar">🧒</div>
+          <h4 id="profile-name" style="margin-bottom:4px">Learner</h4>
+          <div class="badge badge-primary" id="profile-level">Level 1</div>
+        </div>
+
+        <div style="margin-bottom:var(--space-md)">
+          <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:6px">
+            <span>XP Progress</span>
+            <span id="xp-text">0 / 200</span>
+          </div>
+          <div class="progress-container">
+            <div class="progress-bar" id="xp-bar" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h4>Navigation</h4>
+        <a href="dashboard.html" class="sidebar-item active">
+          <span class="icon">📊</span>
+          <span class="label">My Dashboard</span>
+        </a>
+        <a href="lesson.html" class="sidebar-item">
+          <span class="icon">📖</span>
+          <span class="label">Lessons</span>
+        </a>
+        <a href="quiz.html" class="sidebar-item">
+          <span class="icon">📝</span>
+          <span class="label">Take Quiz</span>
+        </a>
+        <a href="index.html" class="sidebar-item">
+          <span class="icon">🏠</span>
+          <span class="label">Home</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <h4>Accessibility</h4>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-outline btn-sm" id="btn-dyslexia">📖 Dyslexia Font</button>
+          <button class="btn btn-outline btn-sm" id="btn-contrast">🌗 High Contrast</button>
+          <button class="btn btn-outline btn-sm" id="btn-simple">🧘 Simple Mode</button>
+          <button class="btn btn-outline btn-sm" id="btn-dark">🌙 Dark Mode</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+      <!-- HEADER -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-xl)">
+        <div>
+          <h2>📊 My Dashboard</h2>
+          <p style="color:var(--text-secondary);margin:0">Track your learning journey</p>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="resetData()" style="color:var(--danger);border-color:var(--danger)">
+          🔄 Reset Progress
+        </button>
+      </div>
+
+      <!-- STATS ROW -->
+      <div class="stats-row" style="margin-bottom:var(--space-xl)">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(108,99,255,0.12)">🎓</div>
+          <div class="stat-value" id="d-lessons">0</div>
+          <div class="stat-label">Lessons Done</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(107,203,119,0.12)">✅</div>
+          <div class="stat-value" id="d-accuracy">0%</div>
+          <div class="stat-label">Accuracy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(255,179,71,0.12)">📝</div>
+          <div class="stat-value" id="d-quizzes">0</div>
+          <div class="stat-label">Quizzes Done</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(255,107,157,0.12)">⭐</div>
+          <div class="stat-value" id="d-points">0</div>
+          <div class="stat-label">Total Points</div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD GRID -->
+      <div class="dashboard-grid">
+        <!-- LEFT COLUMN -->
+        <div>
+          <!-- ADAPTIVE STATUS -->
+          <div class="card adaptive-status-card" style="margin-bottom:var(--space-lg)" id="adaptive-status-card">
+            <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:var(--space-md)">
+              <div>
+                <h3 id="mode-title">🌿 Learning Mode</h3>
+                <p style="opacity:0.85;margin:0" id="mode-description">Your current adaptive learning mode</p>
+              </div>
+              <span id="mode-emoji" style="font-size:48px">🌿</span>
+            </div>
+            <div style="display:flex;gap:var(--space-md);flex-wrap:wrap">
+              <div style="background:rgba(255,255,255,0.2);border-radius:12px;padding:12px 16px;text-align:center">
+                <div style="font-size:22px;font-weight:800" id="mode-difficulty">Medium</div>
+                <div style="font-size:12px;opacity:0.8">Difficulty</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.2);border-radius:12px;padding:12px 16px;text-align:center">
+                <div style="font-size:22px;font-weight:800" id="mode-font">Normal</div>
+                <div style="font-size:12px;opacity:0.8">Font Size</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.2);border-radius:12px;padding:12px 16px;text-align:center">
+                <div style="font-size:22px;font-weight:800" id="mode-hints">Auto</div>
+                <div style="font-size:12px;opacity:0.8">Hints</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ACCURACY CHART -->
+          <div class="card" style="margin-bottom:var(--space-lg)">
+            <h4 style="margin-bottom:var(--space-md)">📈 Accuracy Over Time</h4>
+            <div class="chart-container">
+              <canvas id="accuracy-chart"></canvas>
+            </div>
+          </div>
+
+          <!-- WEEKLY ACTIVITY -->
+          <div class="card" style="margin-bottom:var(--space-lg)">
+            <h4 style="margin-bottom:var(--space-md)">📅 Weekly Activity</h4>
+            <div class="chart-container" style="height:220px">
+              <canvas id="weekly-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div>
+          <!-- LEARNING PATH PROGRESS -->
+          <div class="card" style="margin-bottom:var(--space-lg)">
+            <h4 style="margin-bottom:var(--space-lg)">🗺️ Learning Path</h4>
+            <div id="lesson-progress-list">
+              <!-- Rendered by JS -->
+            </div>
+            <div style="margin-top:var(--space-md)">
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;font-weight:600">
+                <span>Overall Progress</span>
+                <span id="overall-pct">0%</span>
+              </div>
+              <div class="progress-container">
+                <div class="progress-bar" id="overall-bar" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ADAPTIVE MODE SELECTOR -->
+          <div class="card" style="margin-bottom:var(--space-lg)">
+            <h4 style="margin-bottom:var(--space-md)">🎛️ Manual Override</h4>
+            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:var(--space-md)">
+              Teacher or parent can manually set learning mode
+            </p>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button class="btn btn-outline btn-sm" onclick="AdaptiveUI.forceMode('struggling')" style="text-align:left">
+                🌱 Support Mode (Struggling)
+              </button>
+              <button class="btn btn-outline btn-sm" onclick="AdaptiveUI.forceMode('progressing')" style="text-align:left">
+                🌿 Learning Mode (Progressing)
+              </button>
+              <button class="btn btn-outline btn-sm" onclick="AdaptiveUI.forceMode('performing')" style="text-align:left">
+                🌳 Challenge Mode (Performing)
+              </button>
+              <button class="btn btn-outline btn-sm" onclick="AdaptiveUI.forceMode('excelling')" style="text-align:left">
+                🚀 Advanced Mode (Excelling)
+              </button>
+            </div>
+          </div>
+
+          <!-- ACHIEVEMENTS -->
+          <div class="card" style="margin-bottom:var(--space-lg)">
+            <h4 style="margin-bottom:var(--space-md)">🏆 Achievements</h4>
+            <div id="achievements-list">
+              <div class="achievement-item" style="opacity:0.4">
+                <span style="font-size:28px">🐣</span>
+                <div>
+                  <div style="font-weight:700;font-size:14px">First Steps</div>
+                  <div style="font-size:12px;color:var(--text-muted)">Complete your first lesson</div>
+                </div>
+              </div>
+              <div class="achievement-item" style="opacity:0.4">
+                <span style="font-size:28px">🎯</span>
+                <div>
+                  <div style="font-weight:700;font-size:14px">On a Roll!</div>
+                  <div style="font-size:12px;color:var(--text-muted)">Complete 3 lessons</div>
+                </div>
+              </div>
+              <div class="achievement-item" style="opacity:0.4">
+                <span style="font-size:28px">🌟</span>
+                <div>
+                  <div style="font-weight:700;font-size:14px">Easy Explorer</div>
+                  <div style="font-size:12px;color:var(--text-muted)">Complete all easy lessons</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUBJECT BREAKDOWN -->
+      <div class="card" style="margin-bottom:var(--space-xl)">
+        <h4 style="margin-bottom:var(--space-lg)">📚 Subject Performance</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--space-lg)">
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+              <span style="font-weight:700">🔢 Mathematics</span>
+              <span id="math-pct" style="font-weight:800;color:var(--primary)">0%</span>
+            </div>
+            <div class="progress-container">
+              <div class="progress-bar" id="math-bar" style="width:0%;background:linear-gradient(90deg,#6C63FF,#A89CFF)"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+              <span style="font-weight:700">🔬 Science</span>
+              <span id="sci-pct" style="font-weight:800;color:var(--info)">0%</span>
+            </div>
+            <div class="progress-container">
+              <div class="progress-bar" id="sci-bar" style="width:0%;background:linear-gradient(90deg,#4ECDC4,#7BE3DD)"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+              <span style="font-weight:700">💡 Skills</span>
+              <span id="skill-pct" style="font-weight:800;color:var(--warning)">0%</span>
+            </div>
+            <div class="progress-container">
+              <div class="progress-bar" id="skill-bar" style="width:0%;background:linear-gradient(90deg,#FFD93D,#FFB347)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- A11Y TOOLBAR -->
+  <div class="a11y-toolbar">
+    <button class="a11y-btn" id="btn-focus" title="Focus Mode"><span>🎯</span><span class="tooltip">Focus Mode</span></button>
+    <button class="a11y-btn" id="btn-font-up" title="Font Up"><span>A+</span><span class="tooltip">Larger Font</span></button>
+    <button class="a11y-btn" id="btn-font-down" title="Font Down"><span>A-</span><span class="tooltip">Smaller Font</span></button>
+  </div>
+
+  <!-- ADAPTIVE INDICATOR -->
+  <div class="adaptive-indicator" id="adaptive-indicator">
+    <div class="adaptive-dot"></div>
+    <span class="adaptive-text">🌿 Dashboard Active</span>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="js/app.js"></script>
+  <script src="js/adaptiveUI.js"></script>
+  <script src="js/progressTracker.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      loadDashboard();
+    });
+
+    function loadDashboard() {
+      const stats = ProgressTracker.getStats();
+      const profile = App.getProfile();
+      const mode = AdaptiveUI.getCurrentMode();
+      const modeConfig = AdaptiveUI.UI_MODES[mode];
+
+      // Update stats
+      setText('d-lessons', stats.lessonsCompleted);
+      setText('d-accuracy', stats.overallAccuracy + '%');
+      setText('d-quizzes', stats.quizzesCompleted);
+      setText('d-points', stats.totalPoints);
+
+      // Profile
+      setText('profile-name', profile.name);
+      setText('profile-avatar', profile.avatar || '🧒');
+
+      // XP
+      const xp = profile.totalPoints % 200;
+      const xpPct = Math.round((xp / 200) * 100);
+      setText('xp-text', xp + ' / 200');
+      setWidth('xp-bar', xpPct + '%');
+
+      // Level
+      const level = Math.floor(profile.totalPoints / 200) + 1;
+      setText('profile-level', 'Level ' + level);
+      App.updateProfile({ level });
+
+      // Adaptive status
+      setText('mode-title', modeConfig.emoji + ' ' + modeConfig.name);
+      setText('mode-description', modeConfig.description);
+      setText('mode-emoji', modeConfig.emoji);
+      setText('mode-difficulty', AdaptiveUI.getDifficultyFromMode(mode).charAt(0).toUpperCase() + AdaptiveUI.getDifficultyFromMode(mode).slice(1));
+      setText('mode-font', (profile.settings.fontSize || 'normal').charAt(0).toUpperCase() + (profile.settings.fontSize || 'normal').slice(1));
+      setText('mode-hints', mode === 'struggling' || mode === 'progressing' ? 'ON' : 'OFF');
+
+      // Update card gradient
+      const card = document.getElementById('adaptive-status-card');
+      if (card) {
+        const colors = {
+          struggling: 'linear-gradient(135deg,#FF6B6B,#FF8E8E)',
+          progressing: 'linear-gradient(135deg,#FFB347,#FFD093)',
+          performing:  'linear-gradient(135deg,#6BCB77,#8AE88F)',
+          excelling:   'linear-gradient(135deg,#6C63FF,#A89CFF)'
+        };
+        card.style.background = colors[mode] || colors.performing;
+      }
+
+      // Lesson progress list
+      renderLessonProgress();
+
+      // Overall progress
+      setWidth('overall-bar', stats.lessonsProgress + '%');
+      setText('overall-pct', stats.lessonsProgress + '%');
+
+      // Subject percentages (demo)
+      const quizHistory = profile.adaptive.accuracyHistory || [];
+      const avg = quizHistory.length > 0
+        ? Math.round(quizHistory.reduce((a,b)=>a+b,0) / quizHistory.length)
+        : stats.overallAccuracy;
+      setWidth('math-bar', Math.min(100, avg + 5) + '%'); setText('math-pct', Math.min(100, avg+5) + '%');
+      setWidth('sci-bar', Math.min(100, avg) + '%'); setText('sci-pct', avg + '%');
+      setWidth('skill-bar', Math.min(100, avg - 5) + '%'); setText('skill-pct', Math.max(0, avg-5) + '%');
+
+      // Charts
+      renderAccuracyChart();
+      renderWeeklyChart();
+      renderAchievements();
+    }
+
+    function renderLessonProgress() {
+      const lessons = ProgressTracker.getLessonStatus();
+      const container = document.getElementById('lesson-progress-list');
+      if (!container) return;
+
+      container.innerHTML = lessons.slice(0, 6).map(l => `
+        <div class="timeline-item">
+          <div class="timeline-dot" style="background:${l.completed ? '#6BCB77' : l.locked ? '#ccc' : '#6C63FF'}"></div>
+          <div style="flex:1">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-weight:700;font-size:14px">${l.emoji} ${l.title}</span>
+              <span class="badge badge-${l.completed ? 'success' : l.locked ? 'warning' : 'primary'}" style="font-size:10px">
+                ${l.completed ? '✓ Done' : l.locked ? '🔒 Locked' : '→ Open'}
+              </span>
+            </div>
+            <span style="font-size:12px;color:var(--text-muted)">${l.subject} • ${l.difficulty}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderAccuracyChart() {
+      const ctx = document.getElementById('accuracy-chart')?.getContext('2d');
+      if (!ctx) return;
+
+      const trend = ProgressTracker.getAccuracyTrend();
+      const labels = trend.length > 0 ? trend.map(t => 'Q'+t.quiz) : ['Q1','Q2','Q3','Q4','Q5'];
+      const data   = trend.length > 0 ? trend.map(t => t.accuracy) : [0,0,0,0,0];
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Accuracy %',
+            data,
+            borderColor: '#6C63FF',
+            backgroundColor: 'rgba(108,99,255,0.1)',
+            borderWidth: 3,
+            pointBackgroundColor: '#6C63FF',
+            pointRadius: 5,
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              min: 0, max: 100,
+              grid: { color: 'rgba(0,0,0,0.05)' },
+              ticks: { callback: v => v + '%' }
+            },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    function renderWeeklyChart() {
+      const ctx = document.getElementById('weekly-chart')?.getContext('2d');
+      if (!ctx) return;
+
+      const weekly = ProgressTracker.getWeeklyData();
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: weekly.map(w => w.day),
+          datasets: [{
+            label: 'Accuracy',
+            data: weekly.map(w => w.accuracy),
+            backgroundColor: weekly.map(w =>
+              w.accuracy >= 80 ? 'rgba(107,203,119,0.7)' :
+              w.accuracy >= 50 ? 'rgba(255,179,71,0.7)' :
+              w.accuracy > 0  ? 'rgba(255,107,107,0.7)' :
+                                'rgba(200,200,200,0.3)'
+            ),
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { min: 0, max: 100, ticks: { callback: v => v + '%' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    function renderAchievements() {
+      const profile = App.getProfile();
+      const earned = profile.progress.achievements || [];
+      const all = [
+        { id: 'first_lesson', emoji: '🐣', title: 'First Steps', desc: 'Complete your first lesson' },
+        { id: 'three_lessons', emoji: '🎯', title: 'On a Roll!', desc: 'Complete 3 lessons' },
+        { id: 'all_easy', emoji: '🌟', title: 'Easy Explorer', desc: 'Complete all easy lessons' }
+      ];
+
+      const container = document.getElementById('achievements-list');
+      if (!container) return;
+
+      container.innerHTML = all.map(a => `
+        <div class="achievement-item" style="${earned.includes(a.id) ? '' : 'opacity:0.4'}">
+          <span style="font-size:28px">${a.emoji}</span>
+          <div>
+            <div style="font-weight:700;font-size:14px">${a.title}${earned.includes(a.id) ? ' ✓' : ''}</div>
+            <div style="font-size:12px;color:var(--text-muted)">${a.desc}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setText(id, val) { const e = document.getElementById(id); if(e) e.textContent = val; }
+    function setWidth(id, w) { const e = document.getElementById(id); if(e) e.style.width = w; }
+
+    function resetData() {
+      if (!confirm('Reset all progress data? This cannot be undone.')) return;
+      localStorage.removeItem('vp_student_profile');
+      location.reload();
+    }
+  </script>
+</body>
+</html>

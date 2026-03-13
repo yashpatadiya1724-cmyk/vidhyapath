@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VidhyaPath – Adaptive Learning Platform | Vikshit Bharat 2047</title>
+  <meta name="description" content="Adaptive e-learning platform for neurodivergent children – NEP 2020 & Skill India">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/accessibility.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xxl);
+    }
+    .feature-icon-wrap {
+      width: 64px; height: 64px; border-radius: var(--radius-lg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; margin-bottom: var(--space-md);
+    }
+    .profile-setup {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 1000;
+      align-items: center; justify-content: center;
+    }
+    .profile-setup.show { display: flex; }
+    .profile-modal {
+      background: var(--bg-card); border-radius: var(--radius-xl);
+      padding: var(--space-xxl); max-width: 500px; width: 90%;
+      box-shadow: var(--shadow-lg); text-align: center;
+      animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .avatar-picker {
+      display: flex; gap: 12px; justify-content: center;
+      flex-wrap: wrap; margin: var(--space-lg) 0;
+    }
+    .avatar-opt {
+      width: 56px; height: 56px; font-size: 32px;
+      border-radius: 50%; border: 3px solid var(--border);
+      cursor: pointer; display: flex; align-items: center;
+      justify-content: center; transition: var(--transition);
+      background: var(--bg-sidebar);
+    }
+    .avatar-opt:hover, .avatar-opt.selected {
+      border-color: var(--primary);
+      background: rgba(108,99,255,0.1);
+      transform: scale(1.1);
+    }
+    .india-strip {
+      height: 6px;
+      background: linear-gradient(90deg, #FF9933 33%, white 33%, white 66%, #138808 66%);
+    }
+  </style>
+</head>
+<body>
+  <!-- India Theme Strip -->
+  <div class="india-strip"></div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="logo-icon">📚</div>
+      <h1>Vidhya<span>Path</span></h1>
+    </div>
+
+    <ul class="navbar-nav">
+      <li><a href="index.html" class="nav-link active">🏠 Home</a></li>
+      <li><a href="lesson.html" class="nav-link">📖 Lessons</a></li>
+      <li><a href="quiz.html" class="nav-link">📝 Quiz</a></li>
+      <li><a href="dashboard.html" class="nav-link">📊 Dashboard</a></li>
+    </ul>
+
+    <div class="navbar-tools" style="display:flex;align-items:center;gap:12px">
+      <div style="font-size:13px;font-weight:700;color:var(--text-secondary)">
+        ⭐ <span class="student-points">0 pts</span>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:var(--text-secondary)">
+        <span class="student-name">Learner</span>
+      </div>
+      <button class="btn-icon" id="tts-btn" title="Text to Speech" aria-label="Text to Speech">
+        <span id="tts-label">🔊</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main style="min-height:calc(100vh - 72px)">
+    <div class="container" style="padding-top:var(--space-xl);padding-bottom:var(--space-xxl)">
+
+      <!-- HERO SECTION -->
+      <section class="hero animate-fadeIn">
+        <div class="hero-content">
+          <div class="hero-badges">
+            <span class="hero-badge">🇮🇳 Vikshit Bharat 2047</span>
+            <span class="hero-badge">📚 NEP 2020</span>
+            <span class="hero-badge">🎯 Skill India</span>
+            <span class="hero-badge">♿ Inclusive Learning</span>
+          </div>
+          <h2>Learn at Your<br>Own Pace! 🚀</h2>
+          <p>An adaptive learning platform that adjusts to <em>your</em> needs. Perfect for every learner — including those with ADHD, Dyslexia, and Autism.</p>
+          <div style="display:flex;gap:16px;flex-wrap:wrap">
+            <a href="lesson.html" class="btn btn-lg" style="background:white;color:var(--primary);box-shadow:0 4px 16px rgba(0,0,0,0.15)">
+              📖 Start Learning
+            </a>
+            <a href="quiz.html" class="btn btn-lg" style="background:rgba(255,255,255,0.2);color:white;border:2px solid rgba(255,255,255,0.4)">
+              📝 Take Quiz
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- QUICK STATS -->
+      <div class="stats-row animate-slideUp" style="animation-delay:0.1s">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(108,99,255,0.12)">🎓</div>
+          <div class="stat-value" id="stat-lessons">0</div>
+          <div class="stat-label">Lessons Done</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(107,203,119,0.12)">✅</div>
+          <div class="stat-value" id="stat-accuracy">0%</div>
+          <div class="stat-label">Accuracy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(255,179,71,0.12)">⭐</div>
+          <div class="stat-value" id="stat-points">0</div>
+          <div class="stat-label">Points</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(255,107,157,0.12)">🔥</div>
+          <div class="stat-value" id="stat-mode">–</div>
+          <div class="stat-label">Learning Mode</div>
+        </div>
+      </div>
+
+      <!-- FEATURES -->
+      <section class="animate-fadeIn" style="animation-delay:0.2s;margin-bottom:var(--space-xxl)">
+        <div style="text-align:center;margin-bottom:var(--space-xl)">
+          <h2>Why VidhyaPath? 🌟</h2>
+          <p style="color:var(--text-secondary);max-width:600px;margin:0 auto">
+            Built on NEP 2020 principles, our platform adapts to every learner's unique needs
+          </p>
+        </div>
+
+        <div class="feature-grid">
+          <div class="card">
+            <div class="feature-icon-wrap" style="background:rgba(108,99,255,0.12)">🧠</div>
+            <h4>Smart Adaptation</h4>
+            <p style="color:var(--text-secondary);font-size:var(--font-size-sm)">
+              AI-powered system detects your learning pace and automatically adjusts difficulty, font size, and visual complexity.
+            </p>
+          </div>
+          <div class="card">
+            <div class="feature-icon-wrap" style="background:rgba(107,203,119,0.12)">♿</div>
+            <h4>Full Accessibility</h4>
+            <p style="color:var(--text-secondary);font-size:var(--font-size-sm)">
+              Dyslexia-friendly fonts, high contrast mode, text-to-speech, and simplified layouts for neurodivergent learners.
+            </p>
+          </div>
+          <div class="card">
+            <div class="feature-icon-wrap" style="background:rgba(255,107,157,0.12)">📊</div>
+            <h4>Progress Tracking</h4>
+            <p style="color:var(--text-secondary);font-size:var(--font-size-sm)">
+              Real-time dashboard shows accuracy trends, learning speed, and adaptive difficulty level with visual charts.
+            </p>
+          </div>
+          <div class="card">
+            <div class="feature-icon-wrap" style="background:rgba(255,217,61,0.15)">🎯</div>
+            <h4>Skill India Aligned</h4>
+            <p style="color:var(--text-secondary);font-size:var(--font-size-sm)">
+              Curriculum aligned with NEP 2020 and Skill India Mission — Math, Science, and 21st Century Digital Skills.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- LEARNING MODULES PREVIEW -->
+      <section class="animate-fadeIn" style="animation-delay:0.3s;margin-bottom:var(--space-xxl)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-xl)">
+          <h2>📚 Start a Lesson</h2>
+          <a href="lesson.html" class="btn btn-outline">View All →</a>
+        </div>
+
+        <div class="card-grid" id="featured-lessons">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+      <!-- ACCESSIBILITY PANEL -->
+      <section class="card animate-fadeIn" style="animation-delay:0.4s;margin-bottom:var(--space-xxl)">
+        <h3 style="margin-bottom:var(--space-md)">♿ Accessibility Settings</h3>
+        <p style="color:var(--text-secondary);margin-bottom:var(--space-lg)">
+          Customize the learning experience for your needs. All settings are saved automatically.
+        </p>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:var(--space-md)">
+          <button class="btn btn-outline" id="btn-quick-dyslexia" onclick="quickToggle('dyslexiaFont','btn-quick-dyslexia')">
+            📖 Dyslexia Font
+          </button>
+          <button class="btn btn-outline" id="btn-quick-contrast" onclick="quickToggle('highContrast','btn-quick-contrast')">
+            🌗 High Contrast
+          </button>
+          <button class="btn btn-outline" id="btn-quick-simple" onclick="quickToggle('simpleMode','btn-quick-simple')">
+            🧘 Simple Mode
+          </button>
+          <button class="btn btn-outline" id="btn-quick-dark" onclick="quickToggle('darkMode','btn-quick-dark')">
+            🌙 Dark Mode
+          </button>
+          <button class="btn btn-outline" onclick="App.speak('Welcome to VidhyaPath, the adaptive learning platform for every learner.')">
+            🔊 Test Speech
+          </button>
+          <button class="btn btn-outline" onclick="showProfileSetup()">
+            👤 My Profile
+          </button>
+        </div>
+      </section>
+
+      <!-- VIKSHIT BHARAT SECTION -->
+      <section class="card animate-fadeIn" style="animation-delay:0.5s;margin-bottom:var(--space-xxl);
+          background:linear-gradient(135deg,rgba(255,153,51,0.08),rgba(19,136,8,0.08));
+          border-color:rgba(255,153,51,0.3)">
+        <div style="display:flex;align-items:center;gap:var(--space-md);margin-bottom:var(--space-md)">
+          <span style="font-size:36px">🇮🇳</span>
+          <h3 style="margin:0">Vikshit Bharat 2047 Vision</h3>
+        </div>
+        <p style="color:var(--text-secondary)">
+          <strong>Pillar 3: Education & Skill Development</strong> — Building a future-ready India by empowering every student,
+          regardless of learning differences. VidhyaPath is our contribution to making education inclusive, accessible, and
+          effective for all 1.4 billion Indians.
+        </p>
+        <div style="display:flex;gap:var(--space-md);flex-wrap:wrap;margin-top:var(--space-lg)">
+          <div class="badge badge-warning">📚 NEP 2020</div>
+          <div class="badge badge-success">🎯 Skill India</div>
+          <div class="badge badge-primary">🧠 Inclusive Ed</div>
+          <div class="badge badge-info">💻 Digital India</div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>🇮🇳 VidhyaPath — Built for Vikshit Bharat 2047 | NEP 2020 & Skill India | Inclusive Education for All</p>
+    <p style="margin-top:8px">Made with ❤️ for every learner in India</p>
+  </footer>
+
+  <!-- ACCESSIBILITY TOOLBAR -->
+  <div class="a11y-toolbar" role="toolbar" aria-label="Accessibility Tools">
+    <button class="a11y-btn" id="btn-dyslexia" title="Dyslexia Font" aria-label="Toggle Dyslexia Font">
+      <span>Aa</span>
+      <span class="tooltip">Dyslexia Font</span>
+    </button>
+    <button class="a11y-btn" id="btn-contrast" title="High Contrast" aria-label="Toggle High Contrast">
+      <span>◑</span>
+      <span class="tooltip">High Contrast</span>
+    </button>
+    <button class="a11y-btn" id="btn-simple" title="Simple Mode" aria-label="Toggle Simple Mode">
+      <span>🧘</span>
+      <span class="tooltip">Simple Mode</span>
+    </button>
+    <button class="a11y-btn" id="btn-focus" title="Focus Mode" aria-label="Toggle Focus Mode">
+      <span>🎯</span>
+      <span class="tooltip">Focus Mode</span>
+    </button>
+    <button class="a11y-btn" id="btn-font-up" title="Increase Font" aria-label="Increase Font Size">
+      <span>A+</span>
+      <span class="tooltip">Larger Font</span>
+    </button>
+    <button class="a11y-btn" id="btn-font-down" title="Decrease Font" aria-label="Decrease Font Size">
+      <span>A-</span>
+      <span class="tooltip">Smaller Font</span>
+    </button>
+    <button class="a11y-btn" id="btn-dark" title="Dark Mode" aria-label="Toggle Dark Mode">
+      <span>🌙</span>
+      <span class="tooltip">Dark Mode</span>
+    </button>
+  </div>
+
+  <!-- ADAPTIVE INDICATOR -->
+  <div class="adaptive-indicator" id="adaptive-indicator">
+    <div class="adaptive-dot" id="adaptive-dot"></div>
+    <span class="adaptive-text" id="adaptive-text">🌿 Learning Mode Active</span>
+  </div>
+
+  <!-- PROFILE SETUP MODAL -->
+  <div class="profile-setup" id="profile-setup">
+    <div class="profile-modal">
+      <h2 style="margin-bottom:8px">👋 Welcome!</h2>
+      <p style="color:var(--text-secondary)">Set up your learner profile to begin</p>
+
+      <div style="margin:24px 0">
+        <label style="display:block;text-align:left;font-weight:700;margin-bottom:8px">Your Name</label>
+        <input type="text" id="name-input" placeholder="Enter your name..." style="width:100%">
+      </div>
+
+      <div style="margin:24px 0">
+        <label style="display:block;text-align:left;font-weight:700;margin-bottom:12px">Choose Your Avatar</label>
+        <div class="avatar-picker" id="avatar-picker">
+          <div class="avatar-opt selected" data-avatar="🧒" onclick="selectAvatar(this)">🧒</div>
+          <div class="avatar-opt" data-avatar="👧" onclick="selectAvatar(this)">👧</div>
+          <div class="avatar-opt" data-avatar="👦" onclick="selectAvatar(this)">👦</div>
+          <div class="avatar-opt" data-avatar="🧑" onclick="selectAvatar(this)">🧑</div>
+          <div class="avatar-opt" data-avatar="🦁" onclick="selectAvatar(this)">🦁</div>
+          <div class="avatar-opt" data-avatar="🐯" onclick="selectAvatar(this)">🐯</div>
+          <div class="avatar-opt" data-avatar="🦊" onclick="selectAvatar(this)">🦊</div>
+          <div class="avatar-opt" data-avatar="🐼" onclick="selectAvatar(this)">🐼</div>
+        </div>
+      </div>
+
+      <div style="margin:24px 0">
+        <label style="display:block;text-align:left;font-weight:700;margin-bottom:8px">Learning Preference</label>
+        <select id="pref-select" style="width:100%">
+          <option value="normal">Standard Mode</option>
+          <option value="simple">Simple Mode (ADHD friendly)</option>
+          <option value="dyslexia">Dyslexia Mode</option>
+          <option value="highcontrast">High Contrast Mode</option>
+        </select>
+      </div>
+
+      <button class="btn btn-primary" style="width:100%" onclick="saveProfileSetup()">
+        🚀 Start Learning!
+      </button>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="js/app.js"></script>
+  <script src="js/adaptiveUI.js"></script>
+  <script src="js/progressTracker.js"></script>
+  <script>
+    // Quick toggle for accessibility buttons on home page
+    function quickToggle(key, btnId) {
+      const active = App.toggleSetting ? App.toggleSetting(key) : false;
+      document.getElementById(btnId)?.classList.toggle('active', active);
+    }
+
+    // Profile setup
+    let selectedAvatar = '🧒';
+
+    function selectAvatar(el) {
+      document.querySelectorAll('.avatar-opt').forEach(a => a.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedAvatar = el.dataset.avatar;
+    }
+
+    function showProfileSetup() {
+      document.getElementById('profile-setup').classList.add('show');
+      const profile = App.getProfile();
+      document.getElementById('name-input').value = profile.name !== 'Young Learner' ? profile.name : '';
+    }
+
+    function saveProfileSetup() {
+      const name = document.getElementById('name-input').value.trim() || 'Young Learner';
+      const pref = document.getElementById('pref-select').value;
+      const profile = App.getProfile();
+
+      App.updateProfile({ name, avatar: selectedAvatar });
+
+      // Apply preference
+      if (pref === 'simple') App.toggleSetting && (profile.settings.simpleMode = true);
+      else if (pref === 'dyslexia') App.toggleSetting && (profile.settings.dyslexiaFont = true);
+      else if (pref === 'highcontrast') App.toggleSetting && (profile.settings.highContrast = true);
+
+      App.saveProfile();
+      App.applySettings();
+      document.getElementById('profile-setup').classList.remove('show');
+      App.showToast('✅ Profile Saved!', 'Welcome, ' + name + '! Happy learning!', 'success');
+      updateStats();
+      document.querySelectorAll('.student-name').forEach(el => el.textContent = name);
+    }
+
+    // Update home page stats
+    function updateStats() {
+      const stats = ProgressTracker.getStats();
+      const el = (id, val) => { const e = document.getElementById(id); if(e) e.textContent = val; };
+      el('stat-lessons', stats.lessonsCompleted);
+      el('stat-accuracy', stats.overallAccuracy + '%');
+      el('stat-points', stats.totalPoints);
+      el('stat-mode', stats.currentMode.charAt(0).toUpperCase() + stats.currentMode.slice(1));
+    }
+
+    // Check if new user
+    document.addEventListener('DOMContentLoaded', () => {
+      const profile = App.getProfile();
+      if (profile.name === 'Young Learner' && !localStorage.getItem('vp_profile_setup_done')) {
+        setTimeout(() => {
+          document.getElementById('profile-setup').classList.add('show');
+        }, 800);
+      }
+      updateStats();
+      ProgressTracker.renderLessonCards('featured-lessons');
+    });
+  </script>
+</body>
+</html>

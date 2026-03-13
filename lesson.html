@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lessons – VidhyaPath</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/accessibility.css">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    .lesson-view { display: none; }
+    .lesson-view.active { display: block; }
+    .concept-step {
+      position: relative; padding-left: 32px;
+      border-left: 3px solid var(--primary);
+      margin-bottom: var(--space-xl);
+      padding-bottom: var(--space-xl);
+    }
+    .concept-step::before {
+      content: attr(data-step);
+      position: absolute; left: -18px; top: 0;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--primary); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 14px;
+    }
+    .example-box {
+      background: linear-gradient(135deg, rgba(108,99,255,0.08), rgba(255,107,157,0.05));
+      border: 2px solid rgba(108,99,255,0.15);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin: var(--space-md) 0;
+    }
+    .try-box {
+      background: rgba(107,203,119,0.08);
+      border: 2px solid rgba(107,203,119,0.2);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin: var(--space-lg) 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="logo-icon">📚</div>
+      <h1>Vidhya<span>Path</span></h1>
+    </div>
+    <ul class="navbar-nav">
+      <li><a href="index.html" class="nav-link">🏠 Home</a></li>
+      <li><a href="lesson.html" class="nav-link active">📖 Lessons</a></li>
+      <li><a href="quiz.html" class="nav-link">📝 Quiz</a></li>
+      <li><a href="dashboard.html" class="nav-link">📊 Dashboard</a></li>
+    </ul>
+    <div class="navbar-tools" style="display:flex;gap:12px">
+      <span style="font-size:13px;font-weight:700;color:var(--text-secondary)">
+        ⭐ <span class="student-points">0 pts</span>
+      </span>
+      <button class="btn-icon" id="tts-btn"><span id="tts-label">🔊</span></button>
+    </div>
+  </nav>
+
+  <!-- PAGE WRAPPER -->
+  <div class="page-wrapper">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h4>Lessons</h4>
+        <a href="lesson.html" class="sidebar-item active">
+          <span class="icon">📖</span><span class="label">All Lessons</span>
+        </a>
+        <a href="quiz.html" class="sidebar-item">
+          <span class="icon">📝</span><span class="label">Practice Quiz</span>
+        </a>
+        <a href="dashboard.html" class="sidebar-item">
+          <span class="icon">📊</span><span class="label">My Progress</span>
+        </a>
+      </div>
+
+      <div class="sidebar-section">
+        <h4>Filter By Subject</h4>
+        <button class="sidebar-item" onclick="filterLessons('all')" id="filter-all">
+          <span class="icon">📚</span><span class="label">All Subjects</span>
+        </button>
+        <button class="sidebar-item" onclick="filterLessons('math')" id="filter-math">
+          <span class="icon">🔢</span><span class="label">Mathematics</span>
+        </button>
+        <button class="sidebar-item" onclick="filterLessons('science')" id="filter-science">
+          <span class="icon">🔬</span><span class="label">Science</span>
+        </button>
+        <button class="sidebar-item" onclick="filterLessons('skills')" id="filter-skills">
+          <span class="icon">💡</span><span class="label">Skills</span>
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <h4>Quick Access</h4>
+        <button class="sidebar-item" id="btn-dyslexia">
+          <span class="icon">Aa</span><span class="label">Dyslexia Font</span>
+        </button>
+        <button class="sidebar-item" id="btn-contrast">
+          <span class="icon">◑</span><span class="label">High Contrast</span>
+        </button>
+        <button class="sidebar-item" id="btn-simple">
+          <span class="icon">🧘</span><span class="label">Simple Mode</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+      <!-- LESSON LIST VIEW -->
+      <div id="lesson-list-view" class="lesson-view active">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-xl)">
+          <div>
+            <h2>📖 All Lessons</h2>
+            <p style="color:var(--text-secondary);margin:0">Choose a lesson to begin</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span style="font-size:13px;color:var(--text-muted)" id="lessons-count">8 lessons</span>
+          </div>
+        </div>
+
+        <div class="card-grid" id="all-lessons">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- LESSON CONTENT VIEW -->
+      <div id="lesson-content-view" class="lesson-view">
+        <div class="lesson-content-area">
+
+          <!-- Back Button -->
+          <button class="btn btn-outline btn-sm" onclick="showLessonList()" style="margin-bottom:var(--space-lg)">
+            ← Back to Lessons
+          </button>
+
+          <!-- Lesson Header -->
+          <div class="hero" id="lesson-header" style="margin-bottom:var(--space-xl)">
+            <div class="hero-content">
+              <div style="font-size:64px;margin-bottom:12px" id="lesson-hero-emoji">📚</div>
+              <h2 id="lesson-hero-title">Lesson Title</h2>
+              <p id="lesson-hero-desc" style="opacity:0.85">Description</p>
+              <div style="display:flex;gap:12px;flex-wrap:wrap">
+                <span class="hero-badge" id="lesson-badge-subject">Subject</span>
+                <span class="hero-badge" id="lesson-badge-diff">Difficulty</span>
+                <span class="hero-badge" id="lesson-badge-time">Duration</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Read Aloud Button -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg)">
+            <h3>📜 Lesson Content</h3>
+            <button class="btn btn-outline btn-sm" onclick="App.speak(document.querySelector('.reading-text').innerText)">
+              🔊 Read Aloud
+            </button>
+          </div>
+
+          <!-- Content Area -->
+          <div id="lesson-body" class="reading-text">
+            <!-- Dynamic lesson content injected here -->
+          </div>
+
+          <!-- Complete Button -->
+          <div style="display:flex;gap:16px;margin-top:var(--space-xl);flex-wrap:wrap">
+            <button class="btn btn-primary btn-lg" id="complete-btn" onclick="completeCurrentLesson()">
+              ✅ Mark as Complete & Earn 50 Points!
+            </button>
+            <a href="quiz.html" class="btn btn-outline btn-lg" id="quiz-btn">
+              📝 Test Knowledge →
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- A11Y TOOLBAR -->
+  <div class="a11y-toolbar">
+    <button class="a11y-btn" id="btn-focus"><span>🎯</span><span class="tooltip">Focus Mode</span></button>
+    <button class="a11y-btn" id="btn-dark"><span>🌙</span><span class="tooltip">Dark Mode</span></button>
+    <button class="a11y-btn" id="btn-font-up"><span>A+</span><span class="tooltip">Larger Font</span></button>
+    <button class="a11y-btn" id="btn-font-down"><span>A-</span><span class="tooltip">Smaller Font</span></button>
+  </div>
+
+  <!-- ADAPTIVE INDICATOR -->
+  <div class="adaptive-indicator" id="adaptive-indicator">
+    <div class="adaptive-dot"></div>
+    <span class="adaptive-text">🌿 Learning Mode Active</span>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="js/app.js"></script>
+  <script src="js/adaptiveUI.js"></script>
+  <script src="js/progressTracker.js"></script>
+  <script>
+    // ===== LESSON CONTENT DATA =====
+    const LESSON_CONTENT = {
+      lesson_1: {
+        steps: [
+          {
+            title: "What are Numbers?",
+            emoji: "🔢",
+            content: `Numbers are symbols we use to count, measure, and label things. They are everywhere in our daily lives!
+              <br><br>The counting numbers (Natural Numbers) are: 1, 2, 3, 4, 5...`,
+            example: `🍎 1 apple &nbsp;&nbsp; 🍎🍎 2 apples &nbsp;&nbsp; 🍎🍎🍎 3 apples`,
+            tryIt: `Count the objects around you right now. How many chairs are in the room?`
+          },
+          {
+            title: "Place Value",
+            emoji: "📊",
+            content: `Each digit in a number has a place value. In the number <strong>35</strong>:
+              <br>• The digit <strong>3</strong> is in the <strong>Tens</strong> place (= 30)
+              <br>• The digit <strong>5</strong> is in the <strong>Ones</strong> place (= 5)`,
+            example: `<strong>347</strong> = 300 + 40 + 7 &nbsp;&nbsp; (Hundreds | Tens | Ones)`,
+            tryIt: `What is the value of digit 6 in the number 268?`
+          },
+          {
+            title: "Addition",
+            emoji: "➕",
+            content: `Addition means putting together two or more numbers to find the total. We use the <strong>+</strong> sign.
+              <br><br>When we add, the answer is called the <strong>Sum</strong>.`,
+            example: `🌟 7 + 5 = 12 &nbsp;&nbsp; Think: "7 plus 5 more = 12"`,
+            tryIt: `Try: 14 + 23 = ? &nbsp; (Hint: Add ones first, then tens)`
+          },
+          {
+            title: "Subtraction",
+            emoji: "➖",
+            content: `Subtraction means taking away one number from another. We use the <strong>−</strong> sign.
+              <br><br>The answer is called the <strong>Difference</strong>.`,
+            example: `🎈 12 − 4 = 8 &nbsp;&nbsp; (Start with 12, take away 4)`,
+            tryIt: `If you have 20 mangoes and give 7 to a friend, how many do you have left?`
+          }
+        ]
+      },
+      lesson_3: {
+        steps: [
+          {
+            title: "What is Photosynthesis?",
+            emoji: "🌱",
+            content: `Photosynthesis is how green plants make their own food using <strong>sunlight</strong>, <strong>water</strong>, and <strong>carbon dioxide (CO₂)</strong>.
+              <br><br>It's like the plant's kitchen — and sunlight is the energy that cooks the food!`,
+            example: `💡 Sunlight + 💧 Water + CO₂ → 🍬 Glucose (food) + 💨 Oxygen`,
+            tryIt: `Why do plants placed in dark rooms eventually die?`
+          },
+          {
+            title: "Parts of a Plant",
+            emoji: "🪴",
+            content: `Each part of the plant has a special job:<br>
+              <br>• <strong>Roots</strong> — absorb water and minerals from soil
+              <br>• <strong>Stem</strong> — transports water up to the leaves
+              <br>• <strong>Leaves</strong> — where photosynthesis happens
+              <br>• <strong>Flowers</strong> — attract insects for pollination`,
+            example: `🌿 Leaves are green because of <strong>Chlorophyll</strong> — a special pigment that captures sunlight`,
+            tryIt: `If you cut the stem of a plant, why do the leaves wilt?`
+          },
+          {
+            title: "Why is Oxygen Important?",
+            emoji: "💨",
+            content: `A wonderful thing about photosynthesis is that plants release <strong>oxygen</strong> as a by-product.
+              <br><br>This is the same oxygen that <strong>we breathe</strong>! Plants help keep our air clean and fresh.`,
+            example: `🌳 One large tree produces enough oxygen for 2 people to breathe for a year!`,
+            tryIt: `Why are forests called the "lungs of the Earth"?`
+          }
+        ]
+      },
+      lesson_5: {
+        steps: [
+          {
+            title: "What is a Computer?",
+            emoji: "💻",
+            content: `A computer is an electronic device that can store, process, and output information.
+              <br><br>It follows instructions (programs) to perform tasks extremely fast — millions of calculations per second!`,
+            example: `📱 Phones, tablets, laptops and desktops are all types of computers.`,
+            tryIt: `List 5 ways you use computers in your daily life.`
+          },
+          {
+            title: "Input & Output",
+            emoji: "⌨️",
+            content: `• <strong>Input</strong> — Data you give to the computer (typing, clicking, speaking)
+              <br>• <strong>Processing</strong> — The CPU (brain) works on the data
+              <br>• <strong>Output</strong> — Results shown to you (screen, printer, speakers)`,
+            example: `⌨️ Keyboard → 🖥️ Computer → 📺 Screen display`,
+            tryIt: `Is a microphone an input or output device? What about a speaker?`
+          },
+          {
+            title: "The Internet",
+            emoji: "🌐",
+            content: `The Internet is a <strong>global network</strong> that connects millions of computers worldwide.
+              <br><br>It allows us to share information, communicate, learn, and access services from anywhere in the world.`,
+            example: `🇮🇳 India has over 750 million internet users — one of the largest in the world!`,
+            tryIt: `Name 5 things you can do with the internet.`
+          }
+        ]
+      }
+    };
+
+    let currentLessonId = null;
+
+    // ===== RENDER ALL LESSONS =====
+    function renderAllLessons(filter = 'all') {
+      const lessons = ProgressTracker.getLessonStatus();
+      const filtered = filter === 'all' ? lessons : lessons.filter(l => l.subject === filter);
+      const container = document.getElementById('all-lessons');
+      if (!container) return;
+
+      document.getElementById('lessons-count').textContent = filtered.length + ' lessons';
+
+      container.innerHTML = filtered.map(lesson => `
+        <div class="lesson-card ${lesson.locked ? '' : ''}"
+             style="${lesson.locked ? 'opacity:0.6;cursor:not-allowed' : 'cursor:pointer'}"
+             onclick="${lesson.locked ? "App.showToast('🔒 Locked', 'Complete previous lessons to unlock this one', 'warning')" : `openLesson('${lesson.id}')`}">
+          <div class="lesson-thumb"
+               style="background:linear-gradient(135deg,${lesson.color}22,${lesson.color}44)">
+            <span style="font-size:64px">${lesson.emoji}</span>
+            ${lesson.completed ? `<div style="position:absolute;top:12px;right:12px;background:#6BCB77;
+                                            color:white;border-radius:50%;width:32px;height:32px;
+                                            display:flex;align-items:center;justify-content:center;
+                                            font-size:16px;font-weight:800">✓</div>` : ''}
+            ${lesson.locked ? '<div style="position:absolute;top:12px;right:12px;font-size:24px">🔒</div>' : ''}
+          </div>
+          <div class="lesson-body">
+            <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:8px">
+              <h4>${lesson.title}</h4>
+              <span class="badge badge-${lesson.difficulty === 'easy' ? 'success' : lesson.difficulty === 'medium' ? 'warning' : 'danger'}"
+                    style="margin-left:8px;flex-shrink:0">${lesson.difficulty}</span>
+            </div>
+            <p>${lesson.description}</p>
+            <div class="lesson-meta">
+              <div style="display:flex;gap:12px">
+                <span style="font-size:13px;color:var(--text-muted)">⏱ ${lesson.duration}</span>
+                <span style="font-size:13px;color:var(--text-muted)">📚 ${lesson.concepts}</span>
+              </div>
+              <span class="badge badge-${lesson.subject==='math'?'primary':lesson.subject==='science'?'info':'warning'}">
+                ${lesson.subject}
+              </span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterLessons(subject) {
+      document.querySelectorAll('[id^="filter-"]').forEach(b => b.classList.remove('active'));
+      document.getElementById('filter-' + subject)?.classList.add('active');
+      renderAllLessons(subject);
+    }
+
+    function openLesson(lessonId) {
+      const lessons = ProgressTracker.getLessonStatus();
+      const lesson = lessons.find(l => l.id === lessonId);
+      if (!lesson) return;
+
+      currentLessonId = lessonId;
+
+      // Update header
+      document.getElementById('lesson-hero-emoji').textContent = lesson.emoji;
+      document.getElementById('lesson-hero-title').textContent = lesson.title;
+      document.getElementById('lesson-hero-desc').textContent = lesson.description;
+      document.getElementById('lesson-badge-subject').textContent = '📚 ' + lesson.subject;
+      document.getElementById('lesson-badge-diff').textContent = '⚡ ' + lesson.difficulty;
+      document.getElementById('lesson-badge-time').textContent = '⏱ ' + lesson.duration;
+
+      // Update quiz link
+      document.getElementById('quiz-btn').href = `quiz.html?subject=${lesson.subject}&difficulty=${lesson.difficulty}`;
+
+      // Render content
+      const content = LESSON_CONTENT[lessonId];
+      const body = document.getElementById('lesson-body');
+
+      if (content) {
+        body.innerHTML = content.steps.map((step, i) => `
+          <div class="concept-step" data-step="${i+1}">
+            <div class="concept-card">
+              <span class="concept-emoji">${step.emoji}</span>
+              <h3 class="concept-title">${step.title}</h3>
+              <div class="concept-body">${step.content}</div>
+              <div class="example-box">
+                <strong>📌 Example:</strong><br>
+                <span style="font-size:var(--font-size-base)">${step.example}</span>
+              </div>
+              <div class="try-box hint-element">
+                <strong>🤔 Try It Yourself:</strong><br>
+                <span style="color:var(--text-secondary)">${step.tryIt}</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        body.innerHTML = `
+          <div class="concept-card">
+            <span class="concept-emoji">${lesson.emoji}</span>
+            <h3 class="concept-title">${lesson.title}</h3>
+            <div class="concept-body">
+              <p>Welcome to <strong>${lesson.title}</strong>! This lesson covers ${lesson.concepts} key concepts
+              in ${lesson.subject} at ${lesson.difficulty} level.</p>
+              <div class="highlight-box">
+                <strong>📚 What you'll learn:</strong>
+                <ul style="margin-top:8px;padding-left:20px">
+                  <li>Core concepts in ${lesson.subject}</li>
+                  <li>Real-world applications</li>
+                  <li>Practice exercises</li>
+                  <li>Connection to Skill India goals</li>
+                </ul>
+              </div>
+              <p>Complete this lesson and take the quiz to unlock the next level! 🚀</p>
+            </div>
+          </div>
+        `;
+      }
+
+      // Show/hide complete button
+      if (lesson.completed) {
+        document.getElementById('complete-btn').textContent = '✅ Already Completed!';
+        document.getElementById('complete-btn').disabled = true;
+        document.getElementById('complete-btn').style.opacity = '0.6';
+      } else {
+        document.getElementById('complete-btn').textContent = '✅ Mark as Complete & Earn 50 Points!';
+        document.getElementById('complete-btn').disabled = false;
+        document.getElementById('complete-btn').style.opacity = '1';
+      }
+
+      // Switch views
+      document.getElementById('lesson-list-view').classList.remove('active');
+      document.getElementById('lesson-content-view').classList.add('active');
+      window.scrollTo(0, 0);
+
+      App.showToast('📖 Lesson Started!', lesson.title + ' — Good luck!', 'info');
+    }
+
+    function showLessonList() {
+      document.getElementById('lesson-list-view').classList.add('active');
+      document.getElementById('lesson-content-view').classList.remove('active');
+      renderAllLessons();
+    }
+
+    function completeCurrentLesson() {
+      if (!currentLessonId) return;
+      ProgressTracker.completeLesson(currentLessonId);
+      document.getElementById('complete-btn').textContent = '✅ Already Completed!';
+      document.getElementById('complete-btn').disabled = true;
+      document.getElementById('complete-btn').style.opacity = '0.6';
+    }
+
+    // Init
+    document.addEventListener('DOMContentLoaded', () => {
+      renderAllLessons();
+
+      // Check URL param
+      const params = new URLSearchParams(window.location.search);
+      const lessonId = params.get('id');
+      if (lessonId) openLesson(lessonId);
+    });
+  </script>
+</body>
+</html>
