@@ -1,209 +1,101 @@
-# 🚀 VidhyaPath – Adaptive E-Learning Platform
+# VidhyaPath – Adaptive Inclusive E-Learning Platform
 
-## 🇮🇳 Vikshit Bharat 2047 | Pillar 3: Education & Skill Development
-### NEP 2020 & Skill India | Inclusive Learning for All
+Adaptive e-learning platform dynamically tailoring visual complexity, typography, and pacing for neurodivergent learners.
 
----
+[Live demo](TODO: owner to add) | [License](LICENSE)
 
-## 📋 Project Overview
-
-**VidhyaPath** is an intelligent adaptive e-learning platform designed for neurodivergent children (ADHD, Dyslexia, Autism). The system dynamically adjusts its visual complexity, colors, layout, and font styles based on the learner's performance — helping every child learn at their own pace.
+![Screenshot](docs/screenshot.png)  <!-- TODO: owner to add -->
 
 ---
 
-## 🗂️ Folder Structure
+## Features
+- **Dynamic Neurodivergent Adaptability:** Automatically shifts visual complexity, color contrast, and layout density based on student focus and quiz interaction metrics.
+- **Accessibility & Dyslexia Modes:** Toggleable OpenDyslexic typography, high-contrast themes, and customizable letter spacing to reduce visual crowding.
+- **Built-in Speech Synthesis (TTS):** Browser Web Speech API integration providing real-time multi-speed audio narration for lessons and questions.
+- **Gamified Micro-Learning:** Interactive adaptive quizzes with positive reinforcement, instant feedback loops, and visual streak milestones.
+- **Student Performance Analytics:** Chart.js visual telemetry tracking subject mastery, comprehension speed, and focus duration over time.
 
-```
-adaptive-learning-platform/
-│
-├── index.html          ← Home page with hero, features, lesson preview
-├── dashboard.html      ← Student progress dashboard with Chart.js
-├── lesson.html         ← Interactive lesson viewer
-├── quiz.html           ← Adaptive quiz interface
-│
-├── css/
-│   ├── style.css       ← Main stylesheet with CSS variables & themes
-│   ├── accessibility.css ← Dyslexia, high contrast, simple mode styles
-│
-├── js/
-│   ├── app.js          ← Core app, TTS, settings, profile management
-│   ├── adaptiveUI.js   ← Adaptive algorithm engine
-│   ├── quizEngine.js   ← Quiz logic, scoring, timer, feedback
-│   ├── progressTracker.js ← Lesson completion, achievements, stats
-│
-├── assets/
-│   ├── images/
-│   ├── icons/
-│
-├── backend/
-│   ├── server.js       ← Express server
-│   ├── routes.js       ← REST API routes
-│
-└── README.md
+## Tech Stack
+- **Frontend:** HTML5, CSS3 (Accessibility Design Tokens), Vanilla JavaScript (ES6+), Chart.js
+- **Backend:** Node.js, Express, REST APIs
+- **Storage:** LocalStorage (Offline Cache), Express API persistence
+- **Accessibility Standards:** WCAG 2.1 AA Compliance, Web Speech API
+
+## Architecture
+
+```mermaid
+flowchart TD
+    Student["Learner (Neurodivergent Friendly UI)"]
+    AdaptEngine["Adaptive UI Engine (adaptiveUI.js)"]
+    QuizEngine["Gamified Quiz & Assessment Engine (quizEngine.js)"]
+    SpeechSynth["Web Speech TTS Synthesis"]
+    API["Express Backend Router (routes.js)"]
+    LocalStorage["Offline LocalStorage State"]
+
+    Student --> AdaptEngine
+    Student --> SpeechSynth
+    Student --> QuizEngine
+    QuizEngine -->|Telemetry & Score| AdaptEngine
+    QuizEngine -->|Save Progress| LocalStorage
+    QuizEngine -->|Sync History| API
 ```
 
----
+## Getting Started
 
-## 🚀 Quick Start (Browser Only – No Server Needed)
+### Prerequisites
+- Modern web browser (Chrome, Edge, Firefox, Safari)
+- Node.js 18+ (optional for Express backend API)
 
-### Option 1: Open Directly in Browser
+### Setup
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yashpatadiya1724-cmyk/vidhyapath.git
+   cd vidhyapath
+   ```
 
-```bash
-# Just double-click index.html or open in browser:
-open index.html
-```
+2. Copy environment template:
+   ```bash
+   cp .env.example .env
+   ```
 
-All data is stored in **localStorage** – no server required!
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
 
----
+4. Start the app:
+   ```bash
+   npm start
+   ```
+   Open `http://localhost:3000` in your browser.
 
-### Option 2: Run with Node.js Backend
+## Environment Variables
 
-#### Prerequisites
-- Node.js v16+ installed
-- npm v7+
+| Variable | Purpose |
+|---|---|
+| `PORT` | Express backend server listening port (default: `3000`) |
+| `NODE_ENV` | Application environment (`development` / `production`) |
+| `DATABASE_URL` | Optional remote database connection string |
+| `JWT_SECRET` | Secret key for optional user session authentication |
 
-#### Installation
+## Security and Privacy
+- **Privacy by Default:** Student learning paces, dyslexia settings, and quiz answers are stored locally on the learner's device (LocalStorage) without mandatory tracking.
+- **Accessible Design:** No sudden flashing elements or sensory-overloading animations, adhering to safe guidelines for learners with sensory sensitivities.
+- **Known Limitations:** Voice synthesis quality depends on native OS-installed speech voices; offline mode syncs to API only when an active network is detected.
 
-```bash
-# 1. Navigate to project folder
-cd adaptive-learning-platform
+## Roadmap
+- [x] Adaptive UI complexity switching
+- [x] Dyslexia-friendly typography and high-contrast modes
+- [x] Web Speech API narration
+- [ ] Multilingual regional voice synthesis (Hindi, Gujarati, Tamil)
+- [ ] Eye-tracking integration via WebGazer.js for automated attention fatigue detection
 
-# 2. Install dependencies
-npm init -y
-npm install express
+## What I Learned
+- Accessibility is not just an add-on; building software that automatically adjusts its visual layout and pacing empowers neurodivergent learners to thrive without feeling singled out.
+- Combining local browser storage with zero-dependency vanilla JavaScript provides instant, flicker-free learning on low-power tablets in rural schools.
 
-# 3. Start the server
-node backend/server.js
+## Author
+Yash Patadiya: [LinkedIn](https://www.linkedin.com/in/yash-patadiya-973161272/)
 
-# 4. Open in browser
-# http://localhost:3000
-```
-
----
-
-## 🧠 Adaptive Algorithm Logic
-
-### How It Works
-
-The system tracks three key metrics per quiz session:
-1. **Accuracy** (% correct answers)
-2. **Response Time** (average seconds per question)
-3. **Streaks** (consecutive correct/wrong answers)
-
-### Decision Matrix
-
-| Condition | Mode | UI Changes |
-|-----------|------|------------|
-| Accuracy < 50% OR Response > 25s | 🌱 Support Mode | ↑ Font size, Simple layout, High contrast, Hints ON |
-| Accuracy 50–65% | 🌿 Learning Mode | Hints available, Normal difficulty |
-| Accuracy 65–80% | 🌳 Challenge Mode | Hints hidden, Medium difficulty |
-| Accuracy > 80% AND Response < 8s | 🚀 Advanced Mode | Full UI, Hard difficulty, Unlock next lesson |
-
-### Code Example
-
-```javascript
-// From adaptiveUI.js
-function analyze(sessionData) {
-  const { accuracy, avgResponseTime, consecutiveWrong } = sessionData;
-
-  if (accuracy < 50 || avgResponseTime > 25000) {
-    adaptUI("struggling");  // → Increase font, enable simple mode
-  } else if (accuracy >= 80 && avgResponseTime <= 8000) {
-    adaptUI("excelling");   // → Advanced mode, unlock next lesson
-  }
-}
-```
-
----
-
-## ♿ Accessibility Features
-
-| Feature | How to Enable |
-|---------|---------------|
-| 📖 Dyslexia Font | Sidebar button or A11y toolbar |
-| 🌗 High Contrast | Sidebar button or A11y toolbar |
-| 🧘 Simple Mode | Reduces visual complexity |
-| 🎯 Focus Mode | Highlights active content |
-| 🔊 Text-to-Speech | TTS button in navbar |
-| A+ / A- | Font size up/down |
-| 🌙 Dark Mode | Toggle in toolbar |
-
-All settings are **saved to localStorage** and persist across sessions.
-
----
-
-## 📚 Learning Modules
-
-### Subjects Available
-- **🔢 Mathematics** – Numbers, Shapes, Fractions, Algebra
-- **🔬 Science** – Plants, Solar System, Forces, Chemistry
-- **💡 Skill India** – Digital skills, Coding, NEP 2020
-
-### Difficulty Levels
-- 🌱 **Easy** – Foundation level concepts
-- 🌿 **Medium** – Standard curriculum
-- 🔥 **Hard** – Challenge and enrichment
-
----
-
-## 📊 Dashboard Features
-
-- Real-time progress charts (Chart.js)
-- Weekly activity visualization
-- Adaptive mode status indicator
-- Subject-wise performance bars
-- Achievement badges system
-- Manual adaptive mode override (for teachers/parents)
-
----
-
-## 🛠️ Technology Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Frontend | HTML5, CSS3, Vanilla JavaScript |
-| Charts | Chart.js 4.4 |
-| Fonts | Google Fonts (Baloo 2, Nunito, OpenDyslexic) |
-| Storage | localStorage (client) / JSON file (server) |
-| Backend | Node.js + Express |
-| TTS | Web Speech API (built-in browser) |
-
----
-
-## 🎯 NEP 2020 Alignment
-
-- **Holistic learning** through multi-subject modules
-- **Inclusive education** for neurodivergent learners
-- **Digital literacy** via Skill India modules
-- **Formative assessment** through adaptive quizzes
-- **Mother tongue** support (TTS in Indian English)
-
----
-
-## 🔮 Future Enhancements
-
-- [ ] Multilingual support (Hindi, Tamil, Bengali)
-- [ ] Teacher dashboard for classroom management
-- [ ] AI-powered question generation
-- [ ] Voice-controlled navigation
-- [ ] Offline PWA support
-- [ ] 3D interactive elements (Three.js)
-- [ ] Parent progress reports via email
-- [ ] Integration with DIKSHA platform (NCF)
-
----
-
-## 📄 License
-
-Built for educational purposes under Vikshit Bharat 2047 initiative.
-Free to use and modify for non-commercial educational use.
-
----
-
-## 🙏 Credits
-
-Made with ❤️ for every learner in India.
-Aligned with NEP 2020, Skill India Mission, and Vikshit Bharat 2047 goals.
-
-*"Education is the most powerful weapon which you can use to change the world." – Nelson Mandela*
+## License
+MIT
