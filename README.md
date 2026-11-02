@@ -1,9 +1,10 @@
 # VidhyaPath – Adaptive Inclusive E-Learning Platform
-### Viksit Bharat 2047 | NEP 2020 & Skill India
 
 Adaptive e-learning platform dynamically tailoring visual complexity, typography, and pacing for neurodivergent learners.
 
-[Live Demo](TODO: add live link) | [License](LICENSE)
+[Live demo](TODO: owner to add) | [License](LICENSE)
+
+![Screenshot](docs/screenshot.png)  <!-- TODO: owner to add -->
 
 ---
 
@@ -15,7 +16,7 @@ Adaptive e-learning platform dynamically tailoring visual complexity, typography
 - **Student Performance Analytics:** Chart.js visual telemetry tracking subject mastery, comprehension speed, and focus duration over time.
 
 ## Tech Stack
-- **Frontend:** HTML5, CSS3 (Custom Design Tokens & Accessibility Sheets), Vanilla JavaScript (ES6+), Chart.js
+- **Frontend:** HTML5, CSS3 (Accessibility Design Tokens), Vanilla JavaScript (ES6+), Chart.js
 - **Backend:** Node.js, Express, REST APIs
 - **Storage:** LocalStorage (Offline Cache), Express API persistence
 - **Accessibility Standards:** WCAG 2.1 AA Compliance, Web Speech API
@@ -42,21 +43,14 @@ flowchart TD
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+ (optional, runs directly in any modern web browser)
+- Modern web browser (Chrome, Edge, Firefox, Safari)
+- Node.js 18+ (optional for Express backend API)
 
-### Option 1: Zero-Install Quick Start (Browser Only)
+### Setup
 1. Clone the repository:
    ```bash
    git clone https://github.com/yashpatadiya1724-cmyk/vidhyapath.git
    cd vidhyapath
-   ```
-
-2. Open `index.html` directly in any web browser (Chrome, Edge, Firefox, Safari).
-
-### Option 2: Running with Node.js & Express API
-1. Install backend dependencies:
-   ```bash
-   npm install
    ```
 
 2. Copy environment template:
@@ -64,20 +58,25 @@ flowchart TD
    cp .env.example .env
    ```
 
-3. Launch server:
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+4. Start the app:
    ```bash
    npm start
    ```
    Open `http://localhost:3000` in your browser.
 
-## API Endpoints
+## Environment Variables
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/` | Serve main interactive learning portal |
-| `GET` | `/api/lessons` | Retrieve available curriculum lessons |
-| `GET` | `/api/quizzes` | Fetch adaptive quiz question sets |
-| `POST` | `/api/progress` | Submit and sync student performance milestones |
+| Variable | Purpose |
+|---|---|
+| `PORT` | Express backend server listening port (default: `3000`) |
+| `NODE_ENV` | Application environment (`development` / `production`) |
+| `DATABASE_URL` | Optional remote database connection string |
+| `JWT_SECRET` | Secret key for optional user session authentication |
 
 ## Security and Privacy
 - **Privacy by Default:** Student learning paces, dyslexia settings, and quiz answers are stored locally on the learner's device (LocalStorage) without mandatory tracking.
@@ -94,6 +93,9 @@ flowchart TD
 ## What I Learned
 - Accessibility is not just an add-on; building software that automatically adjusts its visual layout and pacing empowers neurodivergent learners to thrive without feeling singled out.
 - Combining local browser storage with zero-dependency vanilla JavaScript provides instant, flicker-free learning on low-power tablets in rural schools.
+
+## Author
+Yash Patadiya: [LinkedIn](https://www.linkedin.com/in/yash-patadiya-973161272/)
 
 ## License
 MIT
