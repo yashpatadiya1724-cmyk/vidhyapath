@@ -1,5 +1,9 @@
 # VidhyaPath – Adaptive Inclusive E-Learning Platform
 
+[![CI](https://github.com/yashpatadiya1724-cmyk/vidhyapath/actions/workflows/ci.yml/badge.svg)](https://github.com/yashpatadiya1724-cmyk/vidhyapath/actions/workflows/ci.yml)
+[![Sponsor](https://img.shields.io/badge/Sponsor-yashpatadiya1724--cmyk-ea4aaa?style=flat&logo=github-sponsors)](https://github.com/sponsors/yashpatadiya1724-cmyk)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Adaptive e-learning platform dynamically tailoring visual complexity, typography, and pacing for neurodivergent learners.
 
 [Live demo](TODO: owner to add) | [License](LICENSE)
@@ -63,7 +67,12 @@ flowchart TD
    npm install
    ```
 
-4. Start the app:
+4. Run automated test suite:
+   ```bash
+   npm test
+   ```
+
+5. Start the app:
    ```bash
    npm start
    ```
