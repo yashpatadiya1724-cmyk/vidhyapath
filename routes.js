@@ -73,6 +73,36 @@ router.put('/student/:id/progress', (req, res) => {
   res.json({ success: true });
 });
 
+// DELETE /api/student/:id
+router.delete('/student/:id', (req, res) => {
+  const db = readDB();
+  if (!db.students[req.params.id]) {
+    return res.status(404).json({ error: 'Student not found' });
+  }
+
+  delete db.students[req.params.id];
+  db.sessions = db.sessions.filter(s => s.studentId !== req.params.id);
+  writeDB(db);
+  res.json({ success: true, message: 'Student and related sessions deleted' });
+});
+
+// GET /api/stats/overview
+router.get('/stats/overview', (req, res) => {
+  const db = readDB();
+  const studentCount = Object.keys(db.students).length;
+  const sessionCount = db.sessions.length;
+  const totalScore = db.sessions.reduce((acc, s) => acc + (s.score || 0), 0);
+  const avgScore = sessionCount > 0 ? Math.round(totalScore / sessionCount) : 0;
+
+  res.json({
+    status: 'OK',
+    mission: 'Vikshit Bharat 2047 – NEP 2020 & Skill India',
+    totalStudents: studentCount,
+    totalSessions: sessionCount,
+    averageQuizScore: avgScore,
+  });
+});
+
 // ===== SESSION ROUTES =====
 
 // POST /api/session - Log quiz session
