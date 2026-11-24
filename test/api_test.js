@@ -74,6 +74,88 @@ const serverPath = path.join(__dirname, '..', 'server.js');
 assert(fs.existsSync(serverPath), 'server.js must exist');
 console.log('✔ Server and routes modules verified!\n');
 
-console.log('----------------------------------------------------');
-console.log('Summary: 4 suites passed, 0 failed');
-console.log('✔ All VidhyaPath automated test suites passed successfully!\n');
+// 5. Live HTTP API Endpoint Verification
+console.log('Test 5: Live Express HTTP Server API Endpoints...');
+const http = require('http');
+const app = require('../server');
+
+function makeRequest(port, method, pathName, data = null) {
+  return new Promise((resolve, reject) => {
+    const postData = data ? JSON.stringify(data) : '';
+    const req = http.request({
+      hostname: '127.0.0.1',
+      port: port,
+      path: pathName,
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    }, (res) => {
+      let body = '';
+      res.on('data', chunk => body += chunk);
+      res.on('end', () => {
+        try {
+          resolve({ status: res.statusCode, data: JSON.parse(body) });
+        } catch {
+          resolve({ status: res.statusCode, data: body });
+        }
+      });
+    });
+    req.on('error', reject);
+    if (postData) req.write(postData);
+    req.end();
+  });
+}
+
+(async () => {
+  const server = app.listen(0);
+  const port = server.address().port;
+
+  try {
+    // 5a. Student 404 lookup
+    const notFoundRes = await makeRequest(port, 'GET', '/api/student/std-unknown-999');
+    assert.strictEqual(notFoundRes.status, 404, 'Unknown student must return 404');
+    console.log('✔ GET /api/student/:id (404 Not Found) verified!');
+
+    // 5b. Create Student via POST
+    const createRes = await makeRequest(port, 'POST', '/api/student', {
+      id: 'std-ci-test',
+      name: 'Vidhya CI User',
+      avatar: 'avatar1.png',
+      settings: { theme: 'dyslexic-friendly' },
+      progress: { lessonsCompleted: 3 },
+      adaptive: { pace: 'self-paced' }
+    });
+    assert.strictEqual(createRes.status, 200, 'Student creation must return 200');
+    assert(createRes.data.success, 'Student creation success must be true');
+    console.log('✔ POST /api/student (Create Student) verified!');
+
+    // 5c. Fetch Created Student
+    const fetchRes = await makeRequest(port, 'GET', '/api/student/std-ci-test');
+    assert.strictEqual(fetchRes.status, 200, 'Fetch student must return 200');
+    assert.strictEqual(fetchRes.data.name, 'Vidhya CI User', 'Student name must match');
+    assert.strictEqual(fetchRes.data.adaptive.pace, 'self-paced');
+    console.log('✔ GET /api/student/:id (Fetch Student) verified!');
+
+    // 5d. Log Session via POST
+    const sessionRes = await makeRequest(port, 'POST', '/api/session', {
+      studentId: 'std-ci-test',
+      score: 95,
+      lessonId: 'intro-science'
+    });
+    assert.strictEqual(sessionRes.status, 200, 'Session creation must return 200');
+    assert(sessionRes.data.sessionId, 'Session must return sessionId');
+    console.log('✔ POST /api/session (Log Quiz Session) verified!\n');
+
+    console.log('----------------------------------------------------');
+    console.log('Summary: 5 suites passed, 0 failed');
+    console.log('✔ All VidhyaPath automated test suites passed successfully!\n');
+  } finally {
+    server.close();
+    const liveDbPath = path.join(__dirname, '..', 'db.json');
+    if (fs.existsSync(liveDbPath)) {
+      try { fs.unlinkSync(liveDbPath); } catch {}
+    }
+  }
+})();

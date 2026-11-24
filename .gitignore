@@ -9,3 +9,5 @@ build/
 Thumbs.db
 .vscode/
 .idea/
+db.json
+test_db.json
