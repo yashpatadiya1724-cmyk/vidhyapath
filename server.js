@@ -46,15 +46,17 @@ app.get('/quiz', (req, res) => {
 });
 
 // ===== START SERVER =====
-app.listen(PORT, () => {
-  console.log('\n🚀 VidhyaPath Server Running!');
-  console.log('================================');
-  console.log(`🌐 URL: http://localhost:${PORT}`);
-  console.log(`📊 Dashboard: http://localhost:${PORT}/dashboard`);
-  console.log(`📖 Lessons: http://localhost:${PORT}/lesson`);
-  console.log(`📝 Quiz: http://localhost:${PORT}/quiz`);
-  console.log('================================');
-  console.log('🇮🇳 Vikshit Bharat 2047 | NEP 2020 | Skill India\n');
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log('\n🚀 VidhyaPath Server Running!');
+    console.log('================================');
+    console.log(`🌐 URL: http://localhost:${PORT}`);
+    console.log(`📊 Dashboard: http://localhost:${PORT}/dashboard`);
+    console.log(`📖 Lessons: http://localhost:${PORT}/lesson`);
+    console.log(`📝 Quiz: http://localhost:${PORT}/quiz`);
+    console.log('================================');
+    console.log('🇮🇳 Vikshit Bharat 2047 | NEP 2020 | Skill India\n');
+  });
+}
 
 module.exports = app;
