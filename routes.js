@@ -223,4 +223,45 @@ router.get('/health', (req, res) => {
   });
 });
 
+// ===== QUIZ ADAPTIVE FEEDBACK & NEP 2020 EVALUATION =====
+// GET /api/quiz/feedback/:score
+router.get('/quiz/feedback/:score', (req, res) => {
+  const score = parseInt(req.params.score, 10);
+  if (isNaN(score) || score < 0 || score > 100) {
+    return res.status(400).json({ error: 'Score must be a number between 0 and 100' });
+  }
+
+  let grade, badge, nepPillar, nextAction;
+  if (score >= 90) {
+    grade = 'A+';
+    badge = 'Gold Scholar';
+    nepPillar = 'Critical Thinking & Deep Conceptual Mastery';
+    nextAction = 'Unlock Advanced Module & Peer Mentorship';
+  } else if (score >= 75) {
+    grade = 'A';
+    badge = 'Silver Achiever';
+    nepPillar = 'Competency-based Learning';
+    nextAction = 'Proceed to next syllabus unit';
+  } else if (score >= 60) {
+    grade = 'B';
+    badge = 'Bronze Learner';
+    nepPillar = 'Foundational Numeracy & Literacy';
+    nextAction = 'Review concept hints and practice interactive drill';
+  } else {
+    grade = 'C';
+    badge = 'Rising Star';
+    nepPillar = 'Formative Remedial Support';
+    nextAction = 'Switch to simplified mode and revisit foundational video';
+  }
+
+  res.json({
+    score,
+    grade,
+    badge,
+    nepPillar,
+    nextAction,
+    passed: score >= 60
+  });
+});
+
 module.exports = router;

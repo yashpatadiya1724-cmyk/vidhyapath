@@ -208,7 +208,24 @@ function makeRequest(port, method, pathName, data = null) {
     assert.strictEqual(deleteRes.data.success, true);
     const postDeleteGet = await makeRequest(port, 'GET', '/api/student/std-ci-test');
     assert.strictEqual(postDeleteGet.status, 404, 'Deleted student must return 404');
-    console.log('✔ DELETE /api/student/:id (Student Cascade Deletion) verified!\n');
+    console.log('✔ DELETE /api/student/:id (Student Cascade Deletion) verified!');
+
+    // 5l. Adaptive Quiz Feedback & NEP 2020 Evaluation API
+    const feedbackMastery = await makeRequest(port, 'GET', '/api/quiz/feedback/95');
+    assert.strictEqual(feedbackMastery.status, 200);
+    assert.strictEqual(feedbackMastery.data.grade, 'A+');
+    assert.strictEqual(feedbackMastery.data.badge, 'Gold Scholar');
+    assert.strictEqual(feedbackMastery.data.passed, true);
+
+    const feedbackRemedial = await makeRequest(port, 'GET', '/api/quiz/feedback/45');
+    assert.strictEqual(feedbackRemedial.status, 200);
+    assert.strictEqual(feedbackRemedial.data.grade, 'C');
+    assert.strictEqual(feedbackRemedial.data.badge, 'Rising Star');
+    assert.strictEqual(feedbackRemedial.data.passed, false);
+
+    const feedbackInvalid = await makeRequest(port, 'GET', '/api/quiz/feedback/150');
+    assert.strictEqual(feedbackInvalid.status, 400);
+    console.log('✔ GET /api/quiz/feedback/:score (NEP 2020 Assessment Rubric) verified!\n');
 
     console.log('----------------------------------------------------');
     console.log('Summary: 5 suites passed, 0 failed');
