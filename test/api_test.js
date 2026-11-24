@@ -192,7 +192,23 @@ function makeRequest(port, method, pathName, data = null) {
     assert.strictEqual(healthRes.status, 200, 'Health check must return 200');
     assert.strictEqual(healthRes.data.status, 'OK');
     assert.strictEqual(healthRes.data.platform, 'VidhyaPath');
-    console.log('✔ GET /api/health (System Health & NEP 2020 Mission) verified!\n');
+    console.log('✔ GET /api/health (System Health & NEP 2020 Mission) verified!');
+
+    // 5j. Platform Stats Overview API
+    const statsRes = await makeRequest(port, 'GET', '/api/stats/overview');
+    assert.strictEqual(statsRes.status, 200, 'Stats overview must return 200');
+    assert.strictEqual(statsRes.data.totalStudents, 1);
+    assert.strictEqual(statsRes.data.totalSessions, 1);
+    assert.strictEqual(statsRes.data.averageQuizScore, 95);
+    console.log('✔ GET /api/stats/overview (Platform Metrics Aggregation) verified!');
+
+    // 5k. Delete Student API
+    const deleteRes = await makeRequest(port, 'DELETE', '/api/student/std-ci-test');
+    assert.strictEqual(deleteRes.status, 200, 'Student deletion must return 200');
+    assert.strictEqual(deleteRes.data.success, true);
+    const postDeleteGet = await makeRequest(port, 'GET', '/api/student/std-ci-test');
+    assert.strictEqual(postDeleteGet.status, 404, 'Deleted student must return 404');
+    console.log('✔ DELETE /api/student/:id (Student Cascade Deletion) verified!\n');
 
     console.log('----------------------------------------------------');
     console.log('Summary: 5 suites passed, 0 failed');
