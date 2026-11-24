@@ -146,7 +146,53 @@ function makeRequest(port, method, pathName, data = null) {
     });
     assert.strictEqual(sessionRes.status, 200, 'Session creation must return 200');
     assert(sessionRes.data.sessionId, 'Session must return sessionId');
-    console.log('✔ POST /api/session (Log Quiz Session) verified!\n');
+    console.log('✔ POST /api/session (Log Quiz Session) verified!');
+
+    // 5e. Update Progress via PUT
+    const progressRes = await makeRequest(port, 'PUT', '/api/student/std-ci-test/progress', {
+      totalPoints: 450,
+      lessonsCompleted: 5
+    });
+    assert.strictEqual(progressRes.status, 200, 'Progress update must return 200');
+    assert(progressRes.data.success, 'Progress update success must be true');
+    console.log('✔ PUT /api/student/:id/progress (Update Progress) verified!');
+
+    // 5f. Fetch Sessions for Student
+    const sessionsRes = await makeRequest(port, 'GET', '/api/sessions/std-ci-test');
+    assert.strictEqual(sessionsRes.status, 200, 'Fetch sessions must return 200');
+    assert(Array.isArray(sessionsRes.data), 'Sessions must be an array');
+    assert.strictEqual(sessionsRes.data.length, 1, 'Should have 1 recorded session');
+    assert.strictEqual(sessionsRes.data[0].score, 95);
+    console.log('✔ GET /api/sessions/:studentId (Student Sessions History) verified!');
+
+    // 5g. Adaptive Analysis API
+    const adaptiveRes = await makeRequest(port, 'POST', '/api/adaptive/analyze', {
+      accuracy: 90,
+      avgResponseTime: 6500,
+      consecutiveCorrect: 6,
+      consecutiveWrong: 0
+    });
+    assert.strictEqual(adaptiveRes.status, 200, 'Adaptive analyze must return 200');
+    assert.strictEqual(adaptiveRes.data.mode, 'excelling');
+    assert.strictEqual(adaptiveRes.data.difficulty, 'hard');
+    assert(adaptiveRes.data.recommendation.unlockNextLesson, 'Next lesson should unlock');
+    console.log('✔ POST /api/adaptive/analyze (Excelling Mode & Recommendations) verified!');
+
+    // 5h. Leaderboard API
+    const lbRes = await makeRequest(port, 'GET', '/api/leaderboard');
+    assert.strictEqual(lbRes.status, 200, 'Leaderboard must return 200');
+    assert(Array.isArray(lbRes.data), 'Leaderboard must be an array');
+    assert(lbRes.data.length >= 1, 'Leaderboard should include created student');
+    assert.strictEqual(lbRes.data[0].name, 'Vidhya CI User');
+    assert.strictEqual(lbRes.data[0].points, 450);
+    console.log('✔ GET /api/leaderboard (Sorted Student Points) verified!');
+
+    // 5i. Health Check API
+    const healthRes = await makeRequest(port, 'GET', '/api/health');
+    assert.strictEqual(healthRes.status, 200, 'Health check must return 200');
+    assert.strictEqual(healthRes.data.status, 'OK');
+    assert.strictEqual(healthRes.data.platform, 'VidhyaPath');
+    console.log('✔ GET /api/health (System Health & NEP 2020 Mission) verified!\n');
 
     console.log('----------------------------------------------------');
     console.log('Summary: 5 suites passed, 0 failed');
